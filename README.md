@@ -1,38 +1,53 @@
-# sv
+# Stwo-Proof Login App
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+## Idea
 
-## Creating a project
+The application allows users to log in or register using a custom hashing-based proof system (`stwo`). The process involves:
 
-If you're seeing this, you've probably already done this step. Congrats!
+1. **Client Input**: The user enters a login and password.
+2. **Hashing Function**: The input is sent to a prover which hashes it using the function `f(x) = x^5`.
+3. **Verification**: The client proves they know the input to the hash function that matches the hash stored in the database.
 
-```bash
-# create a new project in the current directory
-npx sv create
+The app will be built using **SvelteKit** and will include a service worker to spawn additional threads for running the prover. The app will also explore running the prover across multiple threads.
 
-# create a new project in my-app
-npx sv create my-app
-```
+---
 
-## Developing
+## Roadmap for Client-Side Proving
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### 1. **Initialize Project**
+   - Set up a new **SvelteKit** project.
+   - Install required dependencies.
 
-```bash
-npm run dev
+### 2. **Minimal GUI**
+   - Create a basic user interface for login and registration.
+   - Include fields for username and password.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+### 3. **WASM Minimal Example**
+   - Integrate WebAssembly (WASM) into the project.
+   - Test a basic example to ensure WASM integration works.
 
-## Building
+### 4. **Simple Constraints**
+   - Define and implement simple constraints for the proof.
+   - Test constraint generation.
 
-To create a production version of your app:
+### 5. **WASM Stwo**
+   - Implement the `stwo` hashing function (`f(x) = x^5`) using WebAssembly.
 
-```bash
-npm run build
-```
+### 6. **Proof Generation**
+   - Build the functionality to generate proofs using the hashing function and constraints.
+   - Ensure compatibility with WebAssembly.
 
-You can preview the production build with `npm run preview`.
+### 7. **Proof Verification**
+   - Implement proof verification logic on the client side.
+   - Verify that proofs match the hash stored in the database.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+### 8. **Full Pipeline**
+   - Integrate all components into a complete login and registration pipeline.
+   - Optimize performance and ensure the prover runs efficiently across multiple threads using the service worker.
+
+---
+
+## Notes
+- The hashing function `f(x) = x^5` is chosen for simplicity and can be adjusted later. (sigma poseidon)
+- Explore WebAssembly threading capabilities and service workers for scaling proof generation.
+- Ensure all cryptographic and hashing operations are secure and efficient.
