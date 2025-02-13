@@ -1,11 +1,18 @@
 <script lang="ts">
-  import { prove_fibonacci } from '$lib/pkg/login_bg';
-	import '../lib/pkg/login';
+  import { prove_state_machine, ProverOutput } from '../lib/pkg/prover';
 	let username = "";
 	let password = "";
 	let loginStatus = "";
 	let isLoading = false;
 
+	function stringToNumber(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash); // Ensure positive number
+}
 	// In-memory database for users
 	const users: Record<string, string> = {};
 
@@ -23,19 +30,24 @@
     loginStatus = "";
 
     try {
-        // Generate proof in WASM (client-side)
-        let proof = prove_fibonacci();
+        // Convert password to number
+        const passwordAsNumber = stringToNumber(password);
+
+        // Generate proof in WASM using password as input
+        const proofOutput = prove_state_machine(passwordAsNumber);
+        const proof = proofOutput.proof;
+        const channel = proofOutput.channel;
         console.log("Generated proof:", proof.length);
 
         // Send proof to the backend for verification
         const response = await fetch("http://localhost:3000/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ proof }),
+            body: JSON.stringify({ username, proof, channel }),
         });
 
         const data = await response.json();
-		console.log(data);
+        console.log(data);
         
         if (data.valid) {
             if (users[username]) {
@@ -58,6 +70,7 @@
         isLoading = false;
     }
 }
+
 
 </script>
 
